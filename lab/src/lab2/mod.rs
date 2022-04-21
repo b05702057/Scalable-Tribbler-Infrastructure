@@ -601,7 +601,14 @@
 //!
 //! ## Happy Lab 2!
 //!
-mod lab;
+mod bin_client; // make BinStorageClient visible in the lab 2 module
+mod bin_user_client;
+mod front;
+mod keeper; // make Keeper visible in the lab 2 module
+mod lab; // make Front visible in the lab2 module
+
+pub use crate::lab1::lab::new_client;
+pub use crate::lab1::lab::serve_back;
 pub use crate::lab2::lab::new_bin_client;
 pub use crate::lab2::lab::new_front;
 pub use crate::lab2::lab::serve_keeper;

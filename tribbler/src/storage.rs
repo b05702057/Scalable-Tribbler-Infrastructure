@@ -221,7 +221,7 @@ impl Storage for MemStorage {
 
 #[async_trait]
 /// Bin Storage interface
-pub trait BinStorage {
+pub trait BinStorage: Send + Sync {
     /// Fetch a [Storage] bin based on the given bin name.
     async fn bin(&self, name: &str) -> TribResult<Box<dyn Storage>>;
 }

@@ -223,13 +223,17 @@ mod api {
         let t = serde_json::from_str::<WhoWhom>(raw).unwrap();
         match data.is_following(&t.who, &t.whom).await {
             Ok(v) => {
+                println!("is_following output: {}", v);
                 let ul = Bool {
                     v,
                     err: "".to_string(),
                 };
                 build_resp(&ul)
             }
-            Err(e) => err_response(e),
+            Err(e) => {
+                println!("is_following output: {}", e);
+                err_response(e)
+            }
         }
     }
 
