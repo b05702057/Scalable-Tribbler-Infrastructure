@@ -226,6 +226,13 @@ impl Server for FrontendServer {
             return Err(Box::new(TribblerError::UserDoesNotExist(whom.to_string())));
         }
 
+        // The follower cannot follow himself.
+        if who == whom {
+            return Err(Box::new(TribblerError::Unknown(
+                "The follower cannot follow himself.".to_string(),
+            )));
+        }
+
         // append the log entry
         let who_bin = self.bin_storage.bin(who).await?;
         let storage_clock = who_bin.clock(0).await?;
@@ -307,6 +314,13 @@ impl Server for FrontendServer {
             return Err(Box::new(TribblerError::UserDoesNotExist(whom.to_string())));
         }
 
+        // The follower cannot unfollow himself.
+        if who == whom {
+            return Err(Box::new(TribblerError::Unknown(
+                "The follower cannot follow himself.".to_string(),
+            )));
+        }
+
         // append the log entry
         let who_bin = self.bin_storage.bin(who).await?;
         let storage_clock = who_bin.clock(0).await?;
@@ -361,7 +375,7 @@ impl Server for FrontendServer {
 
     async fn is_following(&self, who: &str, whom: &str) -> TribResult<bool> {
         println!("is_follow input: {}", who);
-        println!("is_follow input: {}", who);
+        println!("is_follow input: {}", whom);
         if !is_valid_username(who) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(who.to_string())));
@@ -382,6 +396,13 @@ impl Server for FrontendServer {
         let signed = general_bin.get(&signup_string).await?;
         if signed == None {
             return Err(Box::new(TribblerError::UserDoesNotExist(whom.to_string())));
+        }
+
+        // The follower cannot follow/unfollow himself.
+        if who == whom {
+            return Err(Box::new(TribblerError::Unknown(
+                "The follower cannot follow himself.".to_string(),
+            )));
         }
 
         // check who's followees

@@ -25,6 +25,7 @@ pub async fn new_bin_client(backs: Vec<String>) -> TribResult<Box<dyn BinStorage
 /// This function should block indefinitely and only return upon erroring. Make
 /// sure to send the proper signal to the channel in `kc` when the keeper has
 /// started.
+// #[tokio::main]
 #[allow(unused_variables)]
 pub async fn serve_keeper(kc: KeeperConfig) -> TribResult<()> {
     let mut clock = 0;
@@ -39,63 +40,106 @@ pub async fn serve_keeper(kc: KeeperConfig) -> TribResult<()> {
         None => Ok(()),
     };
 
-    // check the channel
-    match kc.shutdown {
-        None => {
-            while clock <= u64::MAX {
-                // get the max clock from the storages
-                while id < back_num {
-                    let client = new_client(&backs[id]).await?;
-                    clock = cmp::max(clock, client.clock(clock).await?);
-                    id += 1; // next storage
-                }
-
-                // set all clocks to the max clock
-                id = 0;
-                while id < back_num {
-                    let client = new_client(&backs[id]).await?;
-                    clock = cmp::max(clock, client.clock(clock).await?);
-                    id += 1; // next storage
-                }
-
-                // prepare for the next synchornization
-                thread::sleep(one_sec); // sleep for one second
-                id = 0;
+    let handle1 = tokio::spawn(async move {
+        while clock <= u64::MAX {
+            // get the max clock from the storages
+            while id < back_num {
+                let client = new_client(&backs[id]).await.unwrap();
+                clock = cmp::max(clock, client.clock(clock).await.unwrap());
+                id += 1; // next storage
             }
-        }
-        Some(mut receiver) => {
-            while clock <= u64::MAX {
-                // get the max clock from the storages
-                while id < back_num {
-                    let client = new_client(&backs[id]).await?;
-                    clock = cmp::max(clock, client.clock(clock).await?);
-                    id += 1; // next storage
-                }
 
-                // set all clocks to the max clock
-                id = 0;
-                while id < back_num {
-                    let client = new_client(&backs[id]).await?;
-                    clock = cmp::max(clock, client.clock(clock).await?);
-                    id += 1; // next storage
-                }
-
-                // check the receiver
-                match receiver.recv().await {
-                    None => {
-                        ();
-                    }
-                    Some(_) => {
-                        break;
-                    }
-                }
-
-                // prepare for the next synchornization
-                thread::sleep(one_sec); // sleep for one second
-                id = 0;
+            // set all clocks to the max clock
+            id = 0;
+            while id < back_num {
+                let client = new_client(&backs[id]).await.unwrap();
+                clock = cmp::max(clock, client.clock(clock).await.unwrap());
+                id += 1; // next storage
             }
+
+            // prepare for the next synchornization
+            thread::sleep(one_sec); // sleep for one second
+            id = 0;
         }
-    }
+    });
+
+    let handle2 = tokio::spawn(async move {
+        match kc.shutdown {
+            None => {
+                ();
+            }
+            Some(mut receiver) => match receiver.recv().await {
+                None => {
+                    let result = handle1.await;
+                    println!("{:?}", result);
+                }
+                Some(_) => {
+                    handle1.abort();
+                }
+            },
+        }
+    });
+
+    let result = handle2.await;
+    println!("{:?}", result);
+
+    // // check the channel
+    // match kc.shutdown {
+    //     None => {
+    //         while clock <= u64::MAX {
+    //             // get the max clock from the storages
+    //             while id < back_num {
+    //                 let client = new_client(&backs[id]).await?;
+    //                 clock = cmp::max(clock, client.clock(clock).await?);
+    //                 id += 1; // next storage
+    //             }
+
+    //             // set all clocks to the max clock
+    //             id = 0;
+    //             while id < back_num {
+    //                 let client = new_client(&backs[id]).await?;
+    //                 clock = cmp::max(clock, client.clock(clock).await?);
+    //                 id += 1; // next storage
+    //             }
+
+    //             // prepare for the next synchornization
+    //             thread::sleep(one_sec); // sleep for one second
+    //             id = 0;
+    //         }
+    //     }
+    //     Some(mut receiver) => {
+    //         while clock <= u64::MAX {
+    //             // get the max clock from the storages
+    //             while id < back_num {
+    //                 let client = new_client(&backs[id]).await?;
+    //                 clock = cmp::max(clock, client.clock(clock).await?);
+    //                 id += 1; // next storage
+    //             }
+
+    //             // set all clocks to the max clock
+    //             id = 0;
+    //             while id < back_num {
+    //                 let client = new_client(&backs[id]).await?;
+    //                 clock = cmp::max(clock, client.clock(clock).await?);
+    //                 id += 1; // next storage
+    //             }
+
+    //             // check the receiver
+    //             match receiver.recv().await {
+    //                 None => {
+    //                     ();
+    //                 }
+    //                 Some(_) => {
+    //                     break;
+    //                 }
+    //             }
+
+    //             // prepare for the next synchornization
+    //             thread::sleep(one_sec); // sleep for one second
+    //             id = 0;
+    //         }
+    //     }
+    // }
     return Ok(());
 }
 

@@ -9,6 +9,7 @@ use tribbler::config::Config;
 use tribbler::config::DEFAULT_CONFIG_LOCATION;
 use tribbler::err::{TribResult, TribblerError};
 use tribbler::ref_impl::RefServer;
+use tribbler::trib::MAX_FOLLOWING;
 use tribbler::trib::Server;
 
 type Srv = Box<dyn Server + Send + Sync>;
@@ -54,7 +55,7 @@ struct Cfg {
     host: String,
 
     /// the host port to bind
-    #[clap(long, default_value = "8080")]
+    #[clap(long, default_value = "9000")]
     port: u16,
 }
 
@@ -75,7 +76,7 @@ async fn main() -> TribResult<()> {
         }
     };
     let server: web::Data<Srv> = web::Data::new(srv_impl);
-    match populate(&server).await {
+    match home_test(&server).await {
         Ok(_) => info!("Pre-populated test-server successfully"),
         Err(e) => warn!("Failed to pre-populate test server: {}", e),
     }
@@ -119,6 +120,299 @@ async fn populate(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResu
     server.follow("fenglu", "h8liu").await?;
     server.follow("fenglu", "rkapoor").await?;
     server.follow("rkapoor", "h8liu").await?;
+    Ok(())
+}
+
+async fn all_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    sign_up_test(server).await?;
+    list_users_test(server).await?;
+    post_test(server).await?;
+    tribs_test(server).await?;
+    follow_test(server).await?;
+    unfollow_test(server).await?;
+    following_test(server).await?;
+    is_following_test(server).await?;
+    Ok(())
+}
+
+// pass
+async fn sign_up_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // name too long
+    let mut result = server.sign_up("qwertyuiopasdfghjklzxcvbnm").await;
+    println!("{:?}", result);
+    // uppercase letters are not allowed
+    result = server.sign_up("aaA9").await;
+    println!("{:?}", result);
+
+    // signing up repetitively
+    result = server.sign_up("user1").await;
+    println!("{:?}", result);
+    result = server.sign_up("user1").await;
+    println!("{:?}", result);
+    Ok(())
+}
+
+// pass
+async fn list_users_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // get the users from the bin storage
+    let mut result = server.sign_up("z1").await;
+    let mut result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("y2").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("x3").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("w4").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("v5").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("u6").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("t7").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("s8").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("r9").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("q10").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("p11").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("o12").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("n13").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("m14").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("l15").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("k16").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("j17").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("i18").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("h19").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("g20").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+
+    // get the users from the cache
+    result = server.sign_up("f21").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("e22").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("d23").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("c24").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("b25").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    result = server.sign_up("a26").await;
+    result2 = server.list_users().await;
+    println!("{:?}", result);
+    println!("{:?}", result2);
+    Ok(())
+}
+
+// pass
+async fn post_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // The user doesn't exist.
+    let mut result = server.post("user doesn't exist", "", 0).await;
+    println!("{:?}", result);
+
+    // The post is too long.
+    let post = "A".repeat(141);
+    result = server.post("a26", &post, 0).await;
+    println!("{:?}", result);
+    Ok(())
+}
+
+// pass
+async fn tribs_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // check the order of the posts
+    let mut i = 0;
+    while i < 150 {
+        let result = server.post("a26", &("aaa".to_owned() + &i.to_string()), 0).await;
+        println!("{:?}", result);
+        i += 1;
+    }
+    let result2 = server.tribs("a26").await;
+    println!("{:?}", result2);
+    println!("{:?}", result2.unwrap().len());
+    Ok(())
+}
+
+// pass
+async fn follow_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // A user can never follows himself.
+    let mut result = server.follow("a26", "a26").await;
+    println!("{:?}", result);
+
+    // The follower doesn't exist.
+    result = server.follow("x", "a26").await;
+    println!("{:?}", result);
+
+    // The followee doesn't exist.
+    result = server.follow("a26", "y").await;
+    println!("{:?}", result);
+
+    // Assume that a26 is not following b25,
+    // The first follow should succeed, and the second follow should fail.
+    result = server.follow("a26", "b25").await;
+    println!("{:?}", result);
+    result = server.follow("a26", "b25").await;
+    println!("{:?}", result);
+    result = server.unfollow("a26", "b25").await;
+    println!("{:?}", result);       
+
+    // should return error at the last iteration
+    let mut i = 0;
+    while i < MAX_FOLLOWING + 1 {
+        let cur_user = &("user".to_owned() + &i.to_string());
+        let result = server.sign_up(cur_user).await;
+        let result2 = server.follow("a26", cur_user).await;
+        println!("{:?}", result);
+        println!("{:?}", result2);
+        i += 1
+    }
+    
+    // Concurrent test cases are not written yet.
+    Ok(())
+}
+
+// pass
+async fn unfollow_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // A user can never follows himself.
+    let mut result = server.unfollow("a26", "a26").await;
+    println!("{:?}", result);
+
+    // The follower doesn't exist.
+    result = server.unfollow("x", "a26").await;
+    println!("{:?}", result);
+
+    // The followee doesn't exist.
+    result = server.unfollow("a26", "y").await;
+    println!("{:?}", result);
+
+    // Assume that a26 is following b25,
+    // The first unfollow should succeed, and the second unfollow should fail.
+    result = server.follow("a26", "b25").await;
+    println!("{:?}", result);
+    result = server.unfollow("a26", "b25").await;
+    println!("{:?}", result);
+    result = server.unfollow("a26", "b25").await;
+    println!("{:?}", result);
+
+    // Concurrent test cases are not written yet.
+    Ok(())
+}
+
+// pass
+async fn following_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    let result = server.following("a26").await;
+    println!("{:?}", result);
+    Ok(())
+}
+
+// pass
+async fn is_following_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // A user can never follows himself.
+    let mut result = server.is_following("a26", "a26").await;
+    println!("{:?}", result);
+
+    // The follower doesn't exist.
+    result = server.is_following("x", "a26").await;
+    println!("{:?}", result);
+
+    // The followee doesn't exist.
+    result = server.is_following("a26", "y").await;
+    println!("{:?}", result);
+
+    // True and False
+    result = server.is_following("a26", "user1").await;
+    println!("{:?}", result);
+    result = server.is_following("a26", "user3000").await;
+    println!("{:?}", result);
+    Ok(())
+}
+
+async fn home_test(server: &web::Data<Box<dyn Server + Send + Sync>>) -> TribResult<()> {
+    // check the order of the posts
+    let mut i = 0;
+    while i < 50 {
+        let result = server.post("a26", &("aaa".to_owned() + &i.to_string()), 0).await;
+        println!("{:?}", result);
+        i += 1;
+    }
+
+    i = 0;
+    while i < 50 {
+        let result = server.post("user1", &("bbb".to_owned() + &i.to_string()), 0).await;
+        println!("{:?}", result);
+        i += 1;
+    }
+
+    i = 0;
+    while i < 50 {
+        let result = server.post("user2", &("ccc".to_owned() + &i.to_string()), 0).await;
+        println!("{:?}", result);
+        i += 1;
+    }
+
+    // should show 100 posts in order
+    let result = server.home("a26").await;
+    println!("{:?}", result);
+    println!("{:?}", result.unwrap().len());
     Ok(())
 }
 
@@ -223,17 +517,13 @@ mod api {
         let t = serde_json::from_str::<WhoWhom>(raw).unwrap();
         match data.is_following(&t.who, &t.whom).await {
             Ok(v) => {
-                println!("is_following output: {}", v);
                 let ul = Bool {
                     v,
                     err: "".to_string(),
                 };
                 build_resp(&ul)
             }
-            Err(e) => {
-                println!("is_following output: {}", e);
-                err_response(e)
-            }
+            Err(e) => err_response(e)
         }
     }
 
