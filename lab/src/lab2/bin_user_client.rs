@@ -20,6 +20,7 @@ impl KeyString for BinUserClient {
 
     async fn set(&self, kv: &KeyValue) -> TribResult<bool> {
         let prefix_key = (&self.name).to_string() + "::" + &escape(&kv.key);
+        println!("{}", prefix_key);
         return self
             .bin_storage
             .set(&KeyValue {
@@ -31,6 +32,7 @@ impl KeyString for BinUserClient {
 
     async fn keys(&self, p: &Pattern) -> TribResult<List> {
         let prefix_prefix = (&self.name).to_string() + "::" + &p.prefix;
+
         let output_list = self
             .bin_storage
             .keys(&Pattern {
@@ -43,7 +45,9 @@ impl KeyString for BinUserClient {
             Ok(output) => {
                 let mut output_vec = Vec::<String>::new();
                 for key in output.0 {
-                    output_vec.push((&key[2..]).to_string());
+                    println!("{}", key);
+                    let pass_length = self.name.len() + 2;
+                    output_vec.push((&key[pass_length..]).to_string());
                 }
                 return Ok(List(output_vec));
             }
@@ -97,7 +101,8 @@ impl KeyList for BinUserClient {
             Ok(output) => {
                 let mut output_vec = Vec::<String>::new();
                 for key in output.0 {
-                    output_vec.push((&key[2..]).to_string());
+                    let pass_length = self.name.len() + 2;
+                    output_vec.push((&key[pass_length..]).to_string());
                 }
                 return Ok(List(output_vec));
             }
