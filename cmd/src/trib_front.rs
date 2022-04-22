@@ -76,7 +76,7 @@ async fn main() -> TribResult<()> {
         }
     };
     let server: web::Data<Srv> = web::Data::new(srv_impl);
-    match home_test(&server).await {
+    match populate(&server).await {
         Ok(_) => info!("Pre-populated test-server successfully"),
         Err(e) => warn!("Failed to pre-populate test server: {}", e),
     }

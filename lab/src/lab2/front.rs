@@ -21,7 +21,7 @@ pub struct FrontendServer {
 #[async_trait]
 impl Server for FrontendServer {
     async fn sign_up(&self, user: &str) -> TribResult<()> {
-        println!("sign_up input: {}", user);
+        // println!("sign_up input: {}", user);
         if !is_valid_username(user) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(user.to_string())));
@@ -55,7 +55,7 @@ impl Server for FrontendServer {
         let general_bin = self.bin_storage.bin("").await?;
         let mut user_cache = general_bin.list_get("cache").await?;
         if user_cache.0.len() >= MIN_LIST_USER {
-            println!("use cache!");
+            // println!("use cache!");
             return Ok(user_cache.0);
         }
 
@@ -104,14 +104,14 @@ impl Server for FrontendServer {
                 .await?;
         }
         user_cache = general_bin.list_get("cache").await?;
-        println!("list_users output: {:?}", user_cache.0);
+        // println!("list_users output: {:?}", user_cache.0);
         return Ok(user_cache.0);
     }
 
     async fn post(&self, who: &str, post: &str, clock: u64) -> TribResult<()> {
-        println!("post input: {}", who);
-        println!("post input: {}", post);
-        println!("post input: {}", clock);
+        // println!("post input: {}", who);
+        // println!("post input: {}", post);
+        // println!("post input: {}", clock);
         if !is_valid_username(who) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(who.to_string())));
@@ -155,7 +155,7 @@ impl Server for FrontendServer {
     }
 
     async fn tribs(&self, user: &str) -> TribResult<Vec<Arc<Trib>>> {
-        println!("tribs input: {}", user);
+        // println!("tribs input: {}", user);
         if !is_valid_username(user) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(user.to_string())));
@@ -197,13 +197,13 @@ impl Server for FrontendServer {
             }
             trib_vec = trib_vec[old_num..].to_vec();
         }
-        println!("tribs output: {:?}", trib_vec);
+        // println!("tribs output: {:?}", trib_vec);
         return Ok(trib_vec);
     }
 
     async fn follow(&self, who: &str, whom: &str) -> TribResult<()> {
-        println!("follow input: {}", who);
-        println!("follow input: {}", whom);
+        // println!("follow input: {}", who);
+        // println!("follow input: {}", whom);
         if !is_valid_username(who) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(who.to_string())));
@@ -290,8 +290,8 @@ impl Server for FrontendServer {
     }
 
     async fn unfollow(&self, who: &str, whom: &str) -> TribResult<()> {
-        println!("unfollow input: {}", who);
-        println!("unfollow input: {}", whom);
+        // println!("unfollow input: {}", who);
+        // println!("unfollow input: {}", whom);
         if !is_valid_username(who) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(who.to_string())));
@@ -374,8 +374,8 @@ impl Server for FrontendServer {
     }
 
     async fn is_following(&self, who: &str, whom: &str) -> TribResult<bool> {
-        println!("is_follow input: {}", who);
-        println!("is_follow input: {}", whom);
+        // println!("is_follow input: {}", who);
+        // println!("is_follow input: {}", whom);
         if !is_valid_username(who) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(who.to_string())));
@@ -411,7 +411,7 @@ impl Server for FrontendServer {
     }
 
     async fn following(&self, who: &str) -> TribResult<Vec<String>> {
-        println!("following input: {}", who);
+        // println!("following input: {}", who);
         if !is_valid_username(who) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(who.to_string())));
@@ -453,7 +453,7 @@ impl Server for FrontendServer {
     }
 
     async fn home(&self, user: &str) -> TribResult<Vec<Arc<Trib>>> {
-        println!("home input: {}", user);
+        // println!("home input: {}", user);
         if !is_valid_username(user) {
             // invalid user name
             return Err(Box::new(TribblerError::InvalidUsername(user.to_string())));
@@ -487,7 +487,7 @@ impl Server for FrontendServer {
             let old_num = trib_num - MAX_TRIB_FETCH;
             user_home = user_home[old_num..].to_vec();
         }
-        println!("home output: {:?}", user_home);
+        // println!("home output: {:?}", user_home);
         return Ok(user_home);
     }
 }
