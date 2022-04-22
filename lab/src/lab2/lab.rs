@@ -3,6 +3,7 @@ use crate::lab2::bin_client::BinStorageClient;
 use crate::lab2::front::FrontendServer;
 
 use std::cmp;
+use std::string::String;
 use std::thread;
 use std::time;
 use tribbler::{config::KeeperConfig, err::TribResult, storage::BinStorage, trib::Server};
@@ -115,8 +116,4 @@ pub async fn new_front(
 }
 
 // Questions
-// 1. When are keepers ready, and do the initialization fail?
-// 4. check the log logic
-// 6. write concurrent (un)follow test cases
-// 7. modify new_bin_client with http?
-// 8. building hint 1 (signup, follow) and 5 => crash?
+// 1. write concurrent (un)follow test cases in front_trib
