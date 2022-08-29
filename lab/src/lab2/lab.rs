@@ -66,7 +66,8 @@ pub async fn serve_keeper(kc: KeeperConfig) -> TribResult<()> {
     let handle2 = tokio::spawn(async move {
         match kc.shutdown {
             None => {
-                ();
+                let result = handle1.await;
+                println!("{:?}", result);
             }
             Some(mut receiver) => match receiver.recv().await {
                 None => {
@@ -82,64 +83,6 @@ pub async fn serve_keeper(kc: KeeperConfig) -> TribResult<()> {
 
     let result = handle2.await;
     println!("{:?}", result);
-
-    // // check the channel
-    // match kc.shutdown {
-    //     None => {
-    //         while clock <= u64::MAX {
-    //             // get the max clock from the storages
-    //             while id < back_num {
-    //                 let client = new_client(&backs[id]).await?;
-    //                 clock = cmp::max(clock, client.clock(clock).await?);
-    //                 id += 1; // next storage
-    //             }
-
-    //             // set all clocks to the max clock
-    //             id = 0;
-    //             while id < back_num {
-    //                 let client = new_client(&backs[id]).await?;
-    //                 clock = cmp::max(clock, client.clock(clock).await?);
-    //                 id += 1; // next storage
-    //             }
-
-    //             // prepare for the next synchornization
-    //             thread::sleep(one_sec); // sleep for one second
-    //             id = 0;
-    //         }
-    //     }
-    //     Some(mut receiver) => {
-    //         while clock <= u64::MAX {
-    //             // get the max clock from the storages
-    //             while id < back_num {
-    //                 let client = new_client(&backs[id]).await?;
-    //                 clock = cmp::max(clock, client.clock(clock).await?);
-    //                 id += 1; // next storage
-    //             }
-
-    //             // set all clocks to the max clock
-    //             id = 0;
-    //             while id < back_num {
-    //                 let client = new_client(&backs[id]).await?;
-    //                 clock = cmp::max(clock, client.clock(clock).await?);
-    //                 id += 1; // next storage
-    //             }
-
-    //             // check the receiver
-    //             match receiver.recv().await {
-    //                 None => {
-    //                     ();
-    //                 }
-    //                 Some(_) => {
-    //                     break;
-    //                 }
-    //             }
-
-    //             // prepare for the next synchornization
-    //             thread::sleep(one_sec); // sleep for one second
-    //             id = 0;
-    //         }
-    //     }
-    // }
     return Ok(());
 }
 

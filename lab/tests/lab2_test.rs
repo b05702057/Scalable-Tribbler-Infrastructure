@@ -459,39 +459,39 @@ async fn test_home() -> TribResult<()> {
     Ok(())
 }
 
-#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-#[allow(unused_variables)]
-async fn test_concurrent_follow() -> TribResult<()> {
-    let (back_addrs, backs, shutdown_backs, keeper_handle, shutdown_keeper) = setup_n(3).await?;
-    let bin_storage = lab2::new_bin_client(back_addrs.clone()).await?;
-    let tribserver = lab2::new_front(bin_storage).await?;
-    let _ = tribserver.sign_up("bob").await?;
-    let _ = tribserver.sign_up("alice").await?;
+// #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+// #[allow(unused_variables)]
+// async fn test_concurrent_follow() -> TribResult<()> {
+//     let (back_addrs, backs, shutdown_backs, keeper_handle, shutdown_keeper) = setup_n(3).await?;
+//     let bin_storage = lab2::new_bin_client(back_addrs.clone()).await?;
+//     let tribserver = lab2::new_front(bin_storage).await?;
+//     let _ = tribserver.sign_up("bob").await?;
+//     let _ = tribserver.sign_up("alice").await?;
 
-    let mut counter = 0;
-    let mut handles: Vec<JoinHandle<()>> = Vec::new();
-    while (counter < 2) {
-        let temp = tokio::spawn(async move{
-            let (back_addrs, backs, shutdown_backs, keeper_handle, shutdown_keeper) = setup_n(3).await.unwrap();
-            let bin_storage = lab2::new_bin_client(back_addrs.clone()).await.unwrap();
-            let tribserver = lab2::new_front(bin_storage).await.unwrap();
-            let r = tribserver.follow("bob", "alice").await.unwrap();
-        });
+//     let mut counter = 0;
+//     let mut handles: Vec<JoinHandle<()>> = Vec::new();
+//     while (counter < 2) {
+//         let temp = tokio::spawn(async move{
+//             let (back_addrs, backs, shutdown_backs, keeper_handle, shutdown_keeper) = setup_n(3).await.unwrap();
+//             let bin_storage = lab2::new_bin_client(back_addrs.clone()).await.unwrap();
+//             let tribserver = lab2::new_front(bin_storage).await.unwrap();
+//             let r = tribserver.follow("bob", "alice").await.unwrap();
+//         });
 
-        counter += 1;
-        handles.push(temp);
-    }
-    let mut result_counter = 0;
+//         counter += 1;
+//         handles.push(temp);
+//     }
+//     let mut result_counter = 0;
 
-    for item in handles {
-        let temp = item.await;
-        dbg!(&temp);
-        if temp.is_ok() {
-            result_counter += 1;
-        }
-    }
+//     for item in handles {
+//         let temp = item.await;
+//         dbg!(&temp);
+//         if temp.is_ok() {
+//             result_counter += 1;
+//         }
+//     }
 
-    assert_eq!(result_counter, 1);
+//     assert_eq!(result_counter, 1);
 
-    return Ok(());
-}
+//     return Ok(());
+// }
